@@ -10,6 +10,8 @@ logging.basicConfig(filename=filename_logger, level=logging.DEBUG,
 
 # start here
 
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 mistake = False
 
 #take our data

@@ -4,7 +4,7 @@ import json
 from variables_global import filename_modem_type_and_num,filename_contract_num,filename_sn, filename_volume,filename_final_send,directory ,filename_json_response,login_our,password_our
 from pathlib import Path
 import os
-
+import re
 
 # только ХВС
 # в коментариях  на уровне квартир: сектор; номер договора/лицевой счет
@@ -39,7 +39,7 @@ def collect_all(s,header):
 
   account_id=[]
   sector_id_kvartira = []
-  sector_id=[]
+  # sector_id=[]
   consumer=[]
   adress=[]
   serialNumber=[]
@@ -55,41 +55,62 @@ def collect_all(s,header):
   water_measurement = []
   responsibleName = []
   responsiblePhone = []
+  serviceNumber = []
 
   for row in y['measurePoints']:
+
+    try:
+      address_name,  street, house =  row['address'].split(';')
+    except:
+      address_name,  street, house  = "","",""
+
+    if street == '':
+      continue
+
+
     consumer_name = row['fullTitle'].split(' - ')[0].strip()
+    kvartir_full_name = row['fullTitle'].split(' - ')[1].strip()
 
+    kvartira_name = kvartir_full_name
+    mid = row['counterId']
 
+    try:
+      acc_id = re.findall('\\d+', kvartir_full_name)[0]
+    except:
+      acc_id = ''
 
+    try:
+      serviceNum = row['serviceNumber']
+    except:
+      serviceNum =''
 
 
     # dont use this adress and equipment with this model
-    if row['title'] == 'Теплоснабжение' \
-            or 'Малдагалиева стр. 26.1' in row['fullTitle'] \
-            or row['title'] == 'Отопление' \
-            or 'ХВС' not in row['title']  \
-            or consumer_name != 'Аксай 5-й микрорайон, 3Г К1'\
-            or row['title'] == 'Отопение':
+    # if row['title'] == 'Теплоснабжение' \
+    #         or 'Малдагалиева стр. 26.1' in row['fullTitle'] \
+    #         or row['title'] == 'Отопление' \
+    #         or row['title'] == 'Отопение':
+    #  # or consumer_name != 'Аксай 5-й микрорайон, 3Г К1'\
+    #           or 'ХВС' not in row['title']  \
+    if 'ХВС' not in row['title'].upper() and 'ГВС' not in row['title'].upper():
       continue
 
-    try:
-      address_name, sec, street, house =  row['address'].split(';')
-
-    except:
-      address_name, sec, street, house  = row['address'].split(';')[0],"","",""
-
-
-    try:
-      sid_kvartira = row['comment'].split(';')[0].strip()
-      acc_id = row['comment'].split(';')[1].strip()
-    except:
-      sid_kvartira= ''
-      acc_id = ''
 
 
 
-    kvartira_name = row['parentTitle']
-    mid = row['counterId']
+
+    if 'кв' in kvartira_name.lower():
+      sid_kvartira = '2'
+    else:
+      sid_kvartira = '0'
+
+    # try:
+    #   sid_kvartira = row['comment'].split(';')[0].strip()
+    # except:
+    #   sid_kvartira= ''
+
+
+
 
 
 
@@ -133,32 +154,34 @@ def collect_all(s,header):
 
 
     try:
-
       modem_num = str(df_modem_type_and_num.loc[df_modem_type_and_num['node_id'] == row['nodeId'], 'modem_num'].values[0])
-
     except:
       modem_num = None
 
     # if name is too big, oracle doesnt accept
     if len(kvartira_name) >20:
-      kvartira_name = ""
+      kvartira_name = kvartira_name[:20]
+
 
     # if volume is empty or null
     if str(vol)=='nan' :
       continue
 
-    # if volume is empty or null
+    # if sid_kvartira is wrong
     if sid_kvartira not in ['0','1','2' ]:
       continue
 
+    if sid_kvartira  == '0':
+      acc_id = contract_id
+
     # round volume
     vol = round(vol, 3)
-
+    serviceNumber.append(serviceNum)
     account_id.append(acc_id)
     sector_id_kvartira.append(sid_kvartira)
     water_measurement.append( row['title'])
     contract_list.append(contract_id)
-    sector_id.append(sec)
+    # sector_id.append(sec)
     consumer.append(consumer_name)
     adress.append(address_name)
     serialNumber.append(sn)
@@ -178,9 +201,10 @@ def collect_all(s,header):
 
   df = pd.DataFrame({
     'account_id': account_id,
+    'serviceNumber':serviceNumber,
     'sector_id_kvartira':sector_id_kvartira,
     'contract_list':contract_list,
-    'sector_id': sector_id,
+    # 'sector_id': sector_id,
     'consumer': consumer,
     'adress': adress,
     'serialNumber': serialNumber,
@@ -198,6 +222,7 @@ def collect_all(s,header):
   })
 
   df.to_excel(filename_final_send)
+
 
 
 
@@ -446,7 +471,7 @@ with requests.Session() as s:
   # r = s.get('http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=true&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true', headers=header)
   # r = s.get('http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=true&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true', headers=header)
   # r = s.get(
-  #   'http://37.77.128.174:11111/api/v1/Core/Nodes?getSuppliers=true',
+  #  'http://37.77.128.174:11111/api/v0.1/Core/MeasurePoints',
   #   headers=header)
 
   with open(filename_json_response, 'wb') as fd:
