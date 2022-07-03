@@ -390,7 +390,7 @@ def take_data_from_our_data(get_volume = True,get_sn=True,collect= True, create_
 
 
     # # Возвращает список оборудования.
-    # r = s.get('http://37.77.128.174:11111/api/v1/Core/Equipment',headers=header)
+    r = s.get('http://37.77.128.174:11111/api/v1/Core/Equipment',headers=header)
 
 
 
@@ -462,8 +462,19 @@ with requests.Session() as s:
   # r = s.get('http://37.77.128.174:11111/api/v1/Core/MeasurePoints?getEquipment=true&getAttributes=true&getCustomers=true',headers=header)
   # r = s.get('http://37.77.128.174:11111/api/v1/Core/MeasurePoints', headers=header)
 
+  # r = s.get(
+  #     'http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=false&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true&nodeType=House',
+  #   headers=header)
+
+  # r = s.get(
+  #     'http://37.77.128.174:11111/api/v0.1/Core/Nodes/21/MeasurePoints/Communal?getEquipment=true&getCustomers=true&getSuppliers=true&getAttributes=true&nodeType=House',
+  #   headers=header)
   # r = s.get('http://37.77.128.174:11111/api/v1/Data/MeasurePoints/Totals/Last', headers=header)
   # r = s.get('http://37.77.128.174:11111/api/v1/ServerInfo/Extra',headers=header)
+  r = s.get(
+      'http://37.77.128.174:11111/api/v0.1/Core/MeasurePoints?getEquipment=true&getAttributes=true&getCustomers=true',
+    headers=header)
+
 
   # r = s.get('http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=true&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true', headers=header)
   # r = s.get('http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=true&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true', headers=header)

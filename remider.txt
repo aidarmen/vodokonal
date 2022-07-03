@@ -1,0 +1,3 @@
+course code here: https://github.com/aidarmen/vodokonal
+
+you will need this folder "variables_global.py" (passwords,accounts, etc). gave to Sergei for safekeeping
