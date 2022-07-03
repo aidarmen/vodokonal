@@ -13,58 +13,17 @@ import os
 import datetime
 import logging
 
-filename_sparvochnik_adress = os.path.join(directory, filename_sparvochnik_adress)
-filename_final_send = os.path.join(directory, filename_final_send)
-#
-#
-def get_list_of_all_houses_from_them():
-    df = pd.DataFrame({
-    'sector_id': [],
-    'street_id': [],
-    'street_name': [],
-    'house': []})
 
-    sector_id_col =[]
-    street_id_col=[]
-    street_name_col=[]
-    house_col=[]
-
-    for sector_id in [0,1,2]:
-        package_id = 1
-        all_packages = False
-
-        while not all_packages:
-
-            all_packages, df_temp = collect_adress( sector_id=sector_id, package_id = package_id)
-
-
-            # sector_id_col.extend(sector_id_list)
-            # street_id_col.extend(street_id_list)
-            # street_name_col.extend(street_name_list)
-            # house_col.extend(house_list)
-
-
-            df = pd.concat([df, df_temp], axis=0)
-            package_id = package_id + 1
-
-
-
-
-    # df = pd.DataFrame({
-    #     'sector_id': sector_id_col,
-    #     'street_id': street_id_col,
-    #     'street_name': street_name_col,
-    #     'house': house_col
-    # })
-
-    df.to_excel(filename_sparvochnik_adress)
-
-# get_list_of_all_houses_from_them()
 
 
 def send_devices_w_volume():
 
     df_collected= pd.read_excel(filename_final_send)
+    df_collected["id_modem_registered_modem"] = ''
+    df_collected["message_modem"] = ''
+    df_collected["id_modem_registered_volume"] = ''
+    df_collected["message_volume"] = ''
+    df_collected["message_volume_send"] = ''
 
     for index, row in df_collected.iterrows():
 
@@ -76,7 +35,7 @@ def send_devices_w_volume():
                       "modem_type:{modem_type},"
                       "house_num:{house_num}"
                       "kvartira:{kvartira}".format(
-            account_id=row['account_id'],
+            account_id=row['contract_list'],
             sector_id_kvartira=row['sector_id_kvartira'],
             serialNumber=row['serialNumber'],
             modem=row['modem'],
@@ -84,31 +43,57 @@ def send_devices_w_volume():
             house_num=row['house_num'],
             kvartira=row['kvartira']
         ))
-        # try:
-        id_modem_registered = stype_14(
-            organization_id="131",
-            account_id=row['account_id'],
-            sector_id=row['sector_id_kvartira'],
-            consumer=row['consumer'],
-            adress=row['adress'],
-            serialNumber=row['serialNumber'],
-            modem=row['modem'],
-            modem_type=row['modem_type'],
-            street_id=row['street_id'],
-            house_num=row['house_num'],
-            kvartira=row['kvartira'],
-            person=row['responsibleName'],
-            phone=row['responsiblePhone']
 
-        )
+        single_modem_obj = {
+            'account_id':  row['contract_list'],
+            'organization_id': 131,
+            'sector_id': row['sector_id_kvartira'],
+            'consumer': row['consumer'],
+            'adress': row['adress'],
+            'serialNumber': row['serialNumber'],
+            'modem': row['modem'],
+            'modem_type': row['modem_type'],
+            'street_id': row['street_id'],
+            'house_num': row['house_num'],
+            'kvartira': row['kvartira'],
+            'person': row['responsibleName'],
+            'phone': row['responsiblePhone']}
+
+        # try:
+        id_modem_registered_modem, message_modem = stype_14(single_modem_obj=single_modem_obj )
         # tm = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
         # 2021-10-29T00:00:00
+
+        df_collected.at[index, 'id_modem_registered_modem'] = id_modem_registered_modem
+        df_collected.at[index, 'message_modem'] = message_modem
+
         ldt = row['last_datetime'].replace("T", " ")
         last_datetime = datetime.datetime.strptime(ldt, '%Y-%m-%d %H:%M:%S')
         tm = last_datetime.strftime("%d.%m.%Y %H:%M:%S")
-        # stype_15(id_register_to_modem=id_modem_registered, NPok=row['volume'], DtDate=tm)
 
+        id_modem_registered_volume, message_volume = stype_15(
+            id_register_to_modem=id_modem_registered_modem,
+            NPok=row['volume'],
+            DtDate=tm)
+
+
+
+        df_collected.at[index, 'id_modem_registered_volume'] = id_modem_registered_volume
+        df_collected.at[index, 'message_volume'] = message_volume
+
+        if message_volume.isnumeric():
+            df_collected.at[index, 'message_volume_send'] = 1
+        else:
+            df_collected.at[index, 'message_volume_send'] = 0
+
+
+    dt_string = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
+    path = os.path.join(directory, 'datasend_{0}.xlsx'.format(dt_string))
+
+    df_collected.to_excel(path,index=False)
         # except Exception as e:
+        #     row["success"] = 0
         #     logging.debug("[ERROR] failed to send")
         #     logging.debug(e)
 

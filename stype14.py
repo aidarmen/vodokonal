@@ -6,27 +6,33 @@ import re
 from stype17 import stype_17
 
 
+def isNaN(num):
+    return num != num
 
 
-
-def stype_14( stype='14',
-              organization_id="131",
-              account_id="",
-              sector_id="",
-              consumer="",
-              adress="",
-              serialNumber="",
-              modem="",
-              modem_type="",
-              street_id="",
-              house_num="",
-              kvartira="",
-              person ="",
-              phone =''
-              ):
+def stype_14( stype='14', single_modem_obj={}):
 
 
     global url, headers, username, password
+
+
+
+    if single_modem_obj['account_id'] is None or isNaN(single_modem_obj['account_id']) :
+        single_modem_obj['account_id']=''
+
+    try:
+        single_modem_obj['account_id'] = int(single_modem_obj['account_id'])
+    except:
+        single_modem_obj['account_id'] =''
+
+    if single_modem_obj['person'] is None or isNaN(single_modem_obj['person']):
+        single_modem_obj['person']=''
+
+    if single_modem_obj['phone'] is None or isNaN(single_modem_obj['phone']):
+        single_modem_obj['phone']=''
+
+
+
     text = """
  <?xml version="1.0" ?>
 <root>
@@ -50,19 +56,19 @@ Phone = "{phone}"
  />
 </root>
     """.format(
-        organization_id = organization_id,
-        account_id =account_id ,
-        sector_id=sector_id,
-        consumer= consumer,
-        adress=adress,
-        serialNumber=serialNumber,
-        modem=modem,
-        modem_type=modem_type,
-        street_id=street_id,
-        house_num=house_num,
-        kvartira=kvartira,
-        person = person,
-        phone = phone
+        organization_id = single_modem_obj['organization_id'],
+        account_id =single_modem_obj['account_id'] ,
+        sector_id=single_modem_obj['sector_id'],
+        consumer= single_modem_obj['consumer'],
+        adress=single_modem_obj['adress'],
+        serialNumber=single_modem_obj['serialNumber'],
+        modem=single_modem_obj['modem'],
+        modem_type=single_modem_obj['modem_type'],
+        street_id=single_modem_obj['street_id'],
+        house_num=single_modem_obj['house_num'],
+        kvartira=single_modem_obj['kvartira'],
+        person = single_modem_obj['person'],
+        phone = single_modem_obj['phone']
     )
 
     decoded = decode_to_base64(text)
@@ -82,27 +88,33 @@ Phone = "{phone}"
 
     response = requests.post(url,data=body,headers=headers)
     xml = beauty_print_xml(response.content)
-    # print(xml)
+
+
 
 
     status = get_value_from_param(xml, 'Status_Id')
     status_name = get_value_from_param(xml, 'Status_Name')
-    id_modem_registered = get_value_from_param(xml, 'Message')
+    message = get_value_from_param(xml, 'Message')
 
 
+
+    if message.isnumeric():
+        id_modem_registered=message
 
     if status == '3':
         # if device is new and was registered successfully
         # print(status)
         # print(status_name)
         # print(id_modem_registered)
-        return id_modem_registered
-    else:
+        return id_modem_registered,message
+    elif 'Уже существует в системе прибор учета' in message:
         # if device already registered get id_modem_registered
-        id_modem_registered = stype_17(sector_id=sector_id, serialNumber=serialNumber, modem=modem)
+
+        id_modem_registered = stype_17(single_modem_obj=single_modem_obj)
         # print(id_modem_registered)
 
-        return id_modem_registered
-
+        return id_modem_registered,message
+    else:
+        return '',message
 
 

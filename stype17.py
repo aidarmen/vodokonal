@@ -3,19 +3,15 @@ from variables_global import *
 from beauty_print_xml import beauty_print_xml,get_value_from_param
 import requests
 import re
+from stype18 import stype_18
 
 
 
 
-
-def stype_17( stype='17',
-              sector_id="",
-              serialNumber="",
-              modem=""
-              ):
-
+def stype_17( stype='17',single_modem_obj={} ):
 
     global url, headers, username, password
+
     text = """
  <?xml version="1.0" ?>
 <root>
@@ -26,10 +22,12 @@ def stype_17( stype='17',
  />
 </root>
     """.format(
-        sector_id=sector_id,
-        serialNumber=serialNumber,
-        modem=modem
+        sector_id=single_modem_obj['sector_id'],
+        serialNumber=single_modem_obj['serialNumber'],
+        modem=single_modem_obj['modem']
     )
+
+
 
     decoded = decode_to_base64(text)
 
@@ -48,25 +46,22 @@ def stype_17( stype='17',
 
     response = requests.post(url,data=body,headers=headers)
     xml = beauty_print_xml(response.content)
-    # print(xml)
-#     xml = """
-#     <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-#   <soap:Body>
-#     <IntegrationMeteringResponse xmlns="http://tempuri.org/">
-#       <IntegrationMeteringResult><?xml version="1.0"?>
-# <root>
-#   <ActList Status_Id="3" Status_Name="Принято в систему АСИЦРА" Message="470335"/>
-# </root>
-# </IntegrationMeteringResult>
-#     </IntegrationMeteringResponse>
-#   </soap:Body>
-# </soap:Envelope>
-#     """
 
 
-    # print(measurePointId)
+
     id_modem_registered = get_value_from_param(xml, 'Id')
 
+    if "AccountId"  not in xml:
+        AccountId = ''
+    else:
+        AccountId = get_value_from_param(xml, 'AccountId')
+
+    single_modem_obj['id_modem_registered'] = id_modem_registered
+
+
+
+    if AccountId !=single_modem_obj['account_id']:
+        stype_18( single_modem_obj=single_modem_obj )
 
     return id_modem_registered
 

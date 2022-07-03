@@ -14,13 +14,6 @@ import re
 
 # Path("data").mkdir(parents=True, exist_ok=True)
 
-filename_contract_num = os.path.join(directory, filename_contract_num)
-
-filename_modem_type_and_num = os.path.join(directory, filename_modem_type_and_num)
-filename_sn = os.path.join(directory, filename_sn)
-filename_volume = os.path.join(directory, filename_volume)
-filename_final_send = os.path.join(directory, filename_final_send)
-filename_json_response = os.path.join(directory, filename_json_response)
 
 
 def collect_all(s,header):
@@ -37,7 +30,7 @@ def collect_all(s,header):
   df_contracts = pd.read_excel(filename_contract_num)
 
 
-  account_id=[]
+  kvartira_nums=[]
   sector_id_kvartira = []
   # sector_id=[]
   consumer=[]
@@ -75,9 +68,9 @@ def collect_all(s,header):
     mid = row['counterId']
 
     try:
-      acc_id = re.findall('\\d+', kvartir_full_name)[0]
+      kvartira_num = re.findall('\\d+', kvartir_full_name)[0]
     except:
-      acc_id = ''
+      kvartira_num = ''
 
     try:
       serviceNum = row['serviceNumber']
@@ -95,7 +88,8 @@ def collect_all(s,header):
     if 'ХВС' not in row['title'].upper() and 'ГВС' not in row['title'].upper():
       continue
 
-
+    # if address_name == 'Аксай 5-й микрорайон, 3Г К1':
+    #   continue
 
 
 
@@ -111,24 +105,25 @@ def collect_all(s,header):
 
 
 
-
-
-
+    # try:
+    #   contract_id = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'contract_num'].values[0]
+    # except:
+    #   contract_id = ''
 
     try:
-      contract_id = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'contract_num'].values[0]
+      contract_id =  row['comment'].split(';')[0].strip()
     except:
-      contract_id = None
+      contract_id = ''
 
     try:
       rname = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'responsibleName'].values[0]
     except:
-      rname = None
+      rname = ''
 
     try:
       rphone = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'responsiblePhone'].values[0]
     except:
-      rphone = None
+      rphone = ''
 
 
     try:
@@ -171,13 +166,13 @@ def collect_all(s,header):
     if sid_kvartira not in ['0','1','2' ]:
       continue
 
-    if sid_kvartira  == '0':
-      acc_id = contract_id
+    # if sid_kvartira  == '0':
+    #   acc_id = contract_id
 
     # round volume
     vol = round(vol, 3)
     serviceNumber.append(serviceNum)
-    account_id.append(acc_id)
+    kvartira_nums.append(kvartira_num)
     sector_id_kvartira.append(sid_kvartira)
     water_measurement.append( row['title'])
     contract_list.append(contract_id)
@@ -200,7 +195,7 @@ def collect_all(s,header):
 
 
   df = pd.DataFrame({
-    'account_id': account_id,
+    'kvartira_nums': kvartira_nums,
     'serviceNumber':serviceNumber,
     'sector_id_kvartira':sector_id_kvartira,
     'contract_list':contract_list,
@@ -221,7 +216,8 @@ def collect_all(s,header):
     'responsiblePhone':responsiblePhone
   })
 
-  df.to_excel(filename_final_send)
+  df.to_excel(filename_final_send,index=False)
+
 
 
 
@@ -285,7 +281,7 @@ def get_volume_from_measure_points(s,header):
     'last_datetime':last_datetime
   })
 
-  df.to_excel(filename_volume)
+  df.to_excel(filename_volume,index=False)
 
 
 
@@ -428,10 +424,11 @@ def take_data_from_our_data(get_volume = True,get_sn=True,collect= True, create_
 
 
 
-    if create_dir:
-      if not os.path.exists(directory):
-        os.makedirs(directory)
+    if not os.path.exists(directory):
+      os.makedirs(directory)
 
+    # if not os.path.exists(directory_allow):
+    #   os.makedirs(directory_allow)
 
 
     if get_volume:

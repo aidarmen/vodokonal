@@ -34,5 +34,5 @@ def stype_16( stype='16', id_register_to_modem=''):
 
     # print(decoded)
     response = requests.post(url,data=body,headers=headers)
-    print(beauty_print_xml(response.content))
+    # print(beauty_print_xml(response.content))
 

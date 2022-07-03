@@ -5,7 +5,6 @@ import re
 def get_value_from_param(text, param ):
     regex = '{0}="(.*?)"'.format(param)
 
-    print(text)
     res = re.findall(regex, text)[0]
     # res = res.replace(param+"=","")
     # res = res.replace('"',"")

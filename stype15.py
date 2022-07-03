@@ -42,6 +42,15 @@ def stype_15( stype='15', id_register_to_modem='', NPok = '1', DtDate = '20.04.2
     status = get_value_from_param(xml, 'Status_Id')
     # status_name = get_value_from_param(xml, 'Status_Name')
     # id_modem_registered = get_value_from_param(xml, 'Message')
+
+    message = get_value_from_param(xml, 'Message')
+    if message.isnumeric():
+        id_modem_registered=message
+    else:
+        id_modem_registered = ''
+
     if status != '3':
         logging.debug("[ERROR] wrong status")
+
+    return id_modem_registered, message
 
