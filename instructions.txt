@@ -1,0 +1,5 @@
+1) скачать зип файл  отсюда https://github.com/aidarmen/vodokonal
+2) добавить файл variables_global.py в папку с остальными
+3) скачать Python 3.9 из microsoft store(в меню)
+4) открыть планировщик заданий 
+5) указать automation.bat как задачу и время запуска
