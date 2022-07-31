@@ -131,7 +131,8 @@ def send_devices_w_volume():
 # stype_16(id_register_to_modem = "466379")
 
 #  Запрос актуальности привязка модема к приборe учета п
-# id = stype_17(  sector_id="0", serialNumber="1900218", modem="353656102027010")
+# single_modem_obj = {'sector_id':"2", 'serialNumber':"19_3078056", 'modem':"353656102027010"}
+# id = stype_17(single_modem_obj =single_modem_obj )
 # print(id)
 
 # # Запрос на получение адреса по лицевому счету

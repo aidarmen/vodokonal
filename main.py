@@ -4,7 +4,7 @@ from variables_global import filename_logger_info,directory,filename_logger_debu
 import logging
 import os
 import datetime
-from get_list_of_all_houses import get_list_of_all_houses_from_them
+from get_list_all_houses import get_list_of_all_houses_from_them
 
 
 
@@ -30,24 +30,24 @@ mistake = False
 
 
 #take our data
-try:
-    logging.debug("[RUN] take_data_from_our_data()")
-    take_data_from_our_data(get_volume = True,get_sn=True,collect= True)
+# try:
+# logging.debug("[RUN] take_data_from_our_data()")
+# take_data_from_our_data(get_volume = True,get_sn=True,collect= True)
 
-except Exception as e:
-    mistake = True
-    logging.debug("[ERROR] in take_data_from_our_data")
-    logging.debug( e)
+# except Exception as e:
+#     mistake = True
+#     logging.debug("[ERROR] in take_data_from_our_data")
+#     logging.debug( e)
 
 
     # send to them
 if not mistake:
-    get_list_of_all_houses_from_them()
+    # get_list_of_all_houses_from_them()
     logging.debug("[RUN] send_devices_w_volume()")
     send_devices_w_volume()
 else:
     logging.debug("[ERROR] send_devices_w_volume()")
-
+#
 
 # free memory
 for name in dir():

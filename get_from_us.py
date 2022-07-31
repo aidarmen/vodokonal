@@ -27,7 +27,8 @@ def collect_all(s,header):
   df_volume = pd.read_excel(filename_volume)
 
   df_modem_type_and_num = pd.read_excel(filename_modem_type_and_num)
-  df_contracts = pd.read_excel(filename_contract_num)
+  df_contracts = pd.read_excel(filename_contract_num).fillna('')
+
 
 
   kvartira_nums=[]
@@ -52,25 +53,22 @@ def collect_all(s,header):
 
   for row in y['measurePoints']:
 
-    try:
-      address_name,  street, house =  row['address'].split(';')
-    except:
-      address_name,  street, house  = "","",""
+    # try:
+    #   address_name,  street, house =  row['address'].split(';')
+    # except:
+    #   address_name,  street, house  = "","",""
 
-    if street == '':
-      continue
+    # if street == '':
+    #   continue
 
 
     consumer_name = row['fullTitle'].split(' - ')[0].strip()
-    kvartir_full_name = row['fullTitle'].split(' - ')[1].strip()
-
-    kvartira_name = kvartir_full_name
+    # kvartir_full_name = row['fullTitle'].split(' - ')[1].strip()
+    #
+    # kvartira_name = kvartir_full_name
     mid = row['counterId']
 
-    try:
-      kvartira_num = re.findall('\\d+', kvartir_full_name)[0]
-    except:
-      kvartira_num = ''
+
 
     try:
       serviceNum = row['serviceNumber']
@@ -85,11 +83,44 @@ def collect_all(s,header):
     #         or row['title'] == 'Отопение':
     #  # or consumer_name != 'Аксай 5-й микрорайон, 3Г К1'\
     #           or 'ХВС' not in row['title']  \
-    if 'ХВС' not in row['title'].upper() and 'ГВС' not in row['title'].upper():
+
+
+    # added everythong to comments
+    if '+' not in row['comment']:
       continue
 
-    # if address_name == 'Аксай 5-й микрорайон, 3Г К1':
-    #   continue
+
+
+    try:
+      address_name = row['comment'].split(';')[0].strip()
+    except:
+      address_name= ''
+
+
+    try:
+      street = row['comment'].split(';')[1].strip()
+    except:
+      street= ''
+
+    try:
+      house = row['comment'].split(';')[2].strip()
+    except:
+      house= ''
+
+    try:
+      kvartira_name = row['comment'].split(';')[3].strip()
+    except:
+      kvartira_name= ''
+
+
+    try:
+      kvartira_num = re.findall('\\d+', kvartira_name)[0]
+    except:
+      kvartira_num = ''
+
+
+    if 'ХВС' not in row['title'].upper() and 'ГВС' not in row['title'].upper():
+      continue
 
 
 
@@ -98,22 +129,21 @@ def collect_all(s,header):
     else:
       sid_kvartira = '0'
 
-    # try:
-    #   sid_kvartira = row['comment'].split(';')[0].strip()
-    # except:
-    #   sid_kvartira= ''
-
-
-
-    # try:
-    #   contract_id = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'contract_num'].values[0]
-    # except:
-    #   contract_id = ''
 
     try:
-      contract_id =  row['comment'].split(';')[0].strip()
+      contract_id =  row['comment'].split(';')[5].strip()
     except:
       contract_id = ''
+
+
+    try:
+      contract_id = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'contract_num'].values[0]
+    except:
+      contract_id = ''
+    # contract_id = ''
+
+
+
 
     try:
       rname = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'responsibleName'].values[0]
@@ -124,6 +154,7 @@ def collect_all(s,header):
       rphone = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'responsiblePhone'].values[0]
     except:
       rphone = ''
+
 
 
     try:
@@ -162,9 +193,11 @@ def collect_all(s,header):
     if str(vol)=='nan' :
       continue
 
+
+
     # if sid_kvartira is wrong
-    if sid_kvartira not in ['0','1','2' ]:
-      continue
+    # if sid_kvartira not in ['0','1','2' ]:
+    #   continue
 
     # if sid_kvartira  == '0':
     #   acc_id = contract_id
@@ -353,15 +386,17 @@ def get_contract(s,header):
     rname = key['responsibleName']
     rphone = key['responsiblePhone']
 
-    for key2 in dicts['nodeSuppliers']:
-      house_title.append(title)
-      node_id.append(id)
-      responsibleName.append(rname)
-      responsiblePhone.append(rphone)
 
+    house_title.append(title)
+    node_id.append(id)
+    responsibleName.append(rname)
+    responsiblePhone.append(rphone)
+    for key2 in dicts['nodeSuppliers']:
       if key2['nodeId'] == id:
-        cn =key2['contractNumber']
-      contract_num.append(cn)
+        cn = str(key2['contractNumber'])
+      else:
+        cn = ''
+    contract_num.append(cn)
 
   df = pd.DataFrame({
     'title': house_title,
@@ -370,6 +405,7 @@ def get_contract(s,header):
     'responsibleName':responsibleName,
     'responsiblePhone':responsiblePhone
   })
+
 
   df.to_excel(filename_contract_num)
 
@@ -390,7 +426,7 @@ def take_data_from_our_data(get_volume = True,get_sn=True,collect= True, create_
 
 
     # # Возвращает список оборудования.
-    r = s.get('http://37.77.128.174:11111/api/v1/Core/Equipment',headers=header)
+    # r = s.get('http://37.77.128.174:11111/api/v1/Core/Equipment',headers=header)
 
 
 
@@ -440,6 +476,7 @@ def take_data_from_our_data(get_volume = True,get_sn=True,collect= True, create_
       get_contract(s, header)
 
     if collect:
+
       collect_all(s,header)
 
     # to see content of json response
@@ -471,9 +508,14 @@ with requests.Session() as s:
   #   headers=header)
   # r = s.get('http://37.77.128.174:11111/api/v1/Data/MeasurePoints/Totals/Last', headers=header)
   # r = s.get('http://37.77.128.174:11111/api/v1/ServerInfo/Extra',headers=header)
+  # r = s.get(
+  #     'http://37.77.128.174:11111/api/v0.1/Core/MeasurePoints?getEquipment=true&getAttributes=true&getCustomers=true',
+  #   headers=header)
   r = s.get(
-      'http://37.77.128.174:11111/api/v0.1/Core/MeasurePoints?getEquipment=true&getAttributes=true&getCustomers=true',
+    'http://37.77.128.174:11111/api/v1/Core/Nodes?getSuppliers=true',
     headers=header)
+
+
 
 
   # r = s.get('http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=true&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true', headers=header)
