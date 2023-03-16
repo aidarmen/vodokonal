@@ -1,6 +1,10 @@
 from get_from_us import take_data_from_our_data
 from send_to_them import send_devices_w_volume
-from variables_global import filename_logger_info,directory,filename_logger_debug
+from variables_global import filename_logger_info,\
+    directory,filename_logger_debug,filename_contract_num,\
+    filename_modem_type_and_num,filename_sn,filename_volume,\
+    filename_final_send,filename_json_response, filename_sparvochnik_adress
+
 import logging
 import os
 import datetime
@@ -27,22 +31,24 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 mistake = False
 
 
+if not os.path.exists(directory):
+   # Create a new directory because it does not exist
+   os.makedirs(directory)
 
 
 #take our data
-try:
-    logging.debug("[RUN] take_data_from_our_data()")
-    take_data_from_our_data(get_volume = True,get_sn=True,collect= True)
-except Exception as e:
-    mistake = True
-    logging.debug("[ERROR] in take_data_from_our_data")
-    logging.debug( e)
+# try:
+#     logging.debug("[RUN] take_data_from_our_data()")
+#     take_data_from_our_data(get_volume = True,get_sn=True,collect= True)
+# except Exception as e:
+#     mistake = True
+#     logging.debug("[ERROR] in take_data_from_our_data")
+#     logging.debug( e)
 
-take_data_from_our_data(get_volume=True, get_sn=True, collect=True)
 
     #send to them
 if not mistake:
-    get_list_of_all_houses_from_them()
+    # get_list_of_all_houses_from_them()
     logging.debug("[RUN] send_devices_w_volume()")
     send_devices_w_volume()
 else:

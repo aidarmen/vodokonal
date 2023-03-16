@@ -486,46 +486,46 @@ def take_data_from_our_data(get_volume = True,get_sn=True,collect= True, create_
     with open(filename_json_response, 'wb') as fd:
       fd.write(r.content)
 
-# #
-with requests.Session() as s:
-  payload = {
-    "login": login_our,
-    "password": password_our,
-    "application": "string"
-  }
-
-  r = s.post('http://37.77.128.174:11111/api/v1/Login', json =payload)
-  token = r.json()['token']
-  # print("token:", token)
-  header = {"Authorization": 'Bearer {}'.format(token)}
-  # get_contract(s, header)
-  # r = s.get('http://37.77.128.174:11111/api/v1/Core/MeasurePoints?getEquipment=true&getAttributes=true&getCustomers=true',headers=header)
-  # r = s.get('http://37.77.128.174:11111/api/v1/Core/MeasurePoints', headers=header)
-
-  # r = s.get(
-  #     'http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=false&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true&nodeType=House',
-  #   headers=header)
-
-  # r = s.get(
-  #     'http://37.77.128.174:11111/api/v0.1/Core/Nodes/21/MeasurePoints/Communal?getEquipment=true&getCustomers=true&getSuppliers=true&getAttributes=true&nodeType=House',
-  #   headers=header)
-  # r = s.get('http://37.77.128.174:11111/api/v1/Data/MeasurePoints/Totals/Last', headers=header)
-  # r = s.get('http://37.77.128.174:11111/api/v1/ServerInfo/Extra',headers=header)
-  # r = s.get(
-  #     'http://37.77.128.174:11111/api/v0.1/Core/MeasurePoints?getEquipment=true&getAttributes=true&getCustomers=true',
-  #   headers=header)
-  r = s.get(
-    'http://37.77.128.174:11111/api/v1/Core/Nodes?getSuppliers=true',
-    headers=header)
-
-
-
-
-  # r = s.get('http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=true&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true', headers=header)
-  # r = s.get('http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=true&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true', headers=header)
-  # r = s.get(
-  #  'http://37.77.128.174:11111/api/v0.1/Core/MeasurePoints',
-  #   headers=header)
-
-  with open(filename_json_response, 'wb') as fd:
-    fd.write(r.content)
+# test #
+# with requests.Session() as s:
+#   payload = {
+#     "login": login_our,
+#     "password": password_our,
+#     "application": "string"
+#   }
+#
+#   r = s.post('http://37.77.128.174:11111/api/v1/Login', json =payload)
+#   token = r.json()['token']
+#   # print("token:", token)
+#   header = {"Authorization": 'Bearer {}'.format(token)}
+#   # get_contract(s, header)
+#   # r = s.get('http://37.77.128.174:11111/api/v1/Core/MeasurePoints?getEquipment=true&getAttributes=true&getCustomers=true',headers=header)
+#   # r = s.get('http://37.77.128.174:11111/api/v1/Core/MeasurePoints', headers=header)
+#
+#   # r = s.get(
+#   #     'http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=false&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true&nodeType=House',
+#   #   headers=header)
+#
+#   # r = s.get(
+#   #     'http://37.77.128.174:11111/api/v0.1/Core/Nodes/21/MeasurePoints/Communal?getEquipment=true&getCustomers=true&getSuppliers=true&getAttributes=true&nodeType=House',
+#   #   headers=header)
+#   # r = s.get('http://37.77.128.174:11111/api/v1/Data/MeasurePoints/Totals/Last', headers=header)
+#   # r = s.get('http://37.77.128.174:11111/api/v1/ServerInfo/Extra',headers=header)
+#   # r = s.get(
+#   #     'http://37.77.128.174:11111/api/v0.1/Core/MeasurePoints?getEquipment=true&getAttributes=true&getCustomers=true',
+#   #   headers=header)
+#   r = s.get(
+#     'http://37.77.128.174:11111/api/v1/Core/Nodes?getSuppliers=true',
+#     headers=header)
+#
+#
+#
+#
+#   # r = s.get('http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=true&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true', headers=header)
+#   # r = s.get('http://37.77.128.174:11111/api/v1/Core/Nodes?getMeasurePoints=true&getServicemen=true&getServiceCompanies=true&getSignaling=true&getCustomers=true&getSuppliers=true&getAttributes=true', headers=header)
+#   # r = s.get(
+#   #  'http://37.77.128.174:11111/api/v0.1/Core/MeasurePoints',
+#   #   headers=header)
+#
+#   with open(filename_json_response, 'wb') as fd:
+#     fd.write(r.content)
