@@ -193,7 +193,7 @@ def collect_all(s,header):
 
 
     # if volume is empty or null
-    if str(vol)=='nan' :
+    if str(vol) =='nan' or vol is None:
       continue
 
 
