@@ -51,6 +51,7 @@ def collect_all(s,header):
   responsiblePhone = []
   serviceNumber = []
 
+
   for row in y['measurePoints']:
 
     # try:
@@ -68,7 +69,8 @@ def collect_all(s,header):
     # kvartira_name = kvartir_full_name
     mid = row['counterId']
 
-
+    if len(row['comment'].strip() ) > 0:
+      print(row['comment'])
 
     try:
       serviceNum = row['serviceNumber']
@@ -95,6 +97,7 @@ def collect_all(s,header):
       address_name = row['comment'].split(';')[0].strip()
     except:
       address_name= ''
+
 
 
     try:
@@ -131,15 +134,15 @@ def collect_all(s,header):
 
 
     try:
-      contract_id =  row['comment'].split(';')[5].strip()
+      contract_id = row['comment'].split(';')[5].strip()
     except:
       contract_id = ''
 
 
-    try:
-      contract_id = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'contract_num'].values[0]
-    except:
-      contract_id = ''
+    # try:
+    #   contract_id = df_contracts.loc[df_contracts['node_id'] == row['nodeId'], 'contract_num'].values[0]
+    # except:
+    #   contract_id = ''
     # contract_id = ''
 
 

@@ -31,14 +31,15 @@ mistake = False
 
 #take our data
 # try:
-# logging.debug("[RUN] take_data_from_our_data()")
-# take_data_from_our_data(get_volume = True,get_sn=True,collect= True)
-
+#     logging.debug("[RUN] take_data_from_our_data()")
+#     take_data_from_our_data(get_volume = True,get_sn=True,collect= True)
+#
 # except Exception as e:
 #     mistake = True
 #     logging.debug("[ERROR] in take_data_from_our_data")
 #     logging.debug( e)
 
+# take_data_from_our_data(get_volume=True, get_sn=True, collect=True)
 
     # send to them
 if not mistake:
@@ -47,7 +48,7 @@ if not mistake:
     send_devices_w_volume()
 else:
     logging.debug("[ERROR] send_devices_w_volume()")
-#
+
 
 # free memory
 for name in dir():
